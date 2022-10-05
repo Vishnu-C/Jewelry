@@ -11,12 +11,13 @@
 import json
 import sys
 import os
+import glob
 
 def UpdateJsonFile(json_object):
     imageCollectionFolder = sys.argv[1]
     listObj = []
 
-    jsonFilePath = os.path.join(imageCollectionFolder,"sample.json")
+    jsonFilePath = os.path.join(imageCollectionFolder,"CatalagueInfo.json")
     if os.path.isfile(jsonFilePath):
         with open(jsonFilePath, 'r') as readfile:
             listObj = json.load(readfile)
@@ -31,9 +32,36 @@ def GetParamsDict(jewelName, jewelryImagePath, jewelryCADPath):
     paramDict = {"image name" : jewelName, "image path" : jewelryImagePath, "cad path" : jewelryCADPath}
     return paramDict
 
+def FindCADFileFromJewelName(jewelName, CADCollectionFolderList):
+    CADFile = "Not Found"
+    ignoreKeys = ["DOC", "P", "S", "T", "F"]
+    for CADCollectionFolder in CADCollectionFolderList:
+        for CADFilePath in glob.iglob(CADCollectionFolder + '**/**', recursive=True):
+            if (CADFilePath.endswith(".3dm") or CADFilePath.endswith(".3DM")):
+                CADName = os.path.splitext(CADFilePath)[0]
+                jewelNameKeys = jewelName.split()
+                bAlKeys = True
+                for aKey in jewelNameKeys:
+                    if aKey not in ignoreKeys:
+                        if aKey in CADName:
+                            bAlKeys = bAlKeys * True
+                        else:
+                            bAlKeys = bAlKeys * False                    
+                if bAlKeys:
+                    CADFile = os.path.join(CADCollectionFolder, CADFilePath)
+                    print(CADFile)
+                    return CADFile
+    
+    print(CADFile)
+    return CADFile
+
+
 def CreateJsonFile():
+    numberOfInputArgs = len(sys.argv)
     imageCollectionFolder = sys.argv[1]
-    CADCollectionFolder = sys.argv[2]
+    CADCollectionFolderList = []
+    for c in range (2,numberOfInputArgs):
+        CADCollectionFolderList.append(sys.argv[c])
 
     # iterate over files in image collection folder
     for imageFilename in os.listdir(imageCollectionFolder):
@@ -41,9 +69,10 @@ def CreateJsonFile():
             filePath = os.path.join(imageCollectionFolder, imageFilename)
             # checking if it is a file
             if os.path.isfile(filePath):
-                print(filePath)
+                # print(filePath)
                 jewelName = os.path.splitext(imageFilename)[0]
-                paramDict = GetParamsDict(jewelName, filePath, CADCollectionFolder)
+                CADFilePath = FindCADFileFromJewelName(jewelName, CADCollectionFolderList)
+                paramDict = GetParamsDict(jewelName, filePath, CADFilePath)
                 # print(paramDict)
                 # Serializing json
                 json_object = json.dumps(paramDict, indent = 4)
