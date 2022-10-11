@@ -3,6 +3,14 @@
 # Author - Vishnu C
 #########
 
+###### Prerequest
+# A manual selection of images is done and kept in a individual folder 
+
+###### Run Info
+# Run in EditPythonScript window of MatrixGold
+ 
+# Selected images for catalgue creation <selected_images_folder_path>, the folder paths of all the respective CAD files to be searched are listed in [<CAD_folder_path>] 
+
 ##### Process performed
 # Given folder with jewelry images
 # respective CAD file is found 
@@ -12,14 +20,6 @@
 # Check if can be ungrouped so that can resize with RingResizer of RhinoGold
 # Create an unique ID 
 # Create/Update json file with image name, CAD name, unique name, volume and various checks
-
-###### Prerequest
-# A manual selection of images is done and kept in a individual folder 
-
-###### Run command
-# python CatalagueInfoCreator.py -imageCollection <selected_images_folder_path> -CADCollection list[<CAD_folder_path>]
- 
-# Selected images for catalgue creation <selected_images_folder_path>, the folder paths of all the respective CAD files to be searched for are to be listed in [<CAD_folder_path>] 
 
 import json
 import sys
@@ -113,6 +113,11 @@ def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
                                         CADVolume = CADVolume + blockVolume
                                         # print CADVolume
                                         # print "results :", results 
+                                        
+                        # Convert to centimeter 
+                        cenimeter_system = 3 # https://developer.rhino3d.com/api/RhinoScriptSyntax/#document-UnitSystem
+                        fScaleFactor = rs.UnitScale(cenimeter_system)
+                        CADVolume = fScaleFactor**3 * CADVolume
                         items = ("CanUngroup", "No", "Yes"),("LargeStoneMissing","No","Yes")
                         bQuries = rs.GetBoolean("Check queries", items, (False,False) )
                         if bRingResize is None:
