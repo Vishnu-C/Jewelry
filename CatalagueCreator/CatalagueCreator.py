@@ -14,7 +14,6 @@ import os
 import glob
 
 import rhinoscriptsyntax as rs
-import scriptcontext as sc
 
 def UpdateJsonFile(imageCollectionFolder, json_object):
     listObj = []
@@ -30,8 +29,8 @@ def UpdateJsonFile(imageCollectionFolder, json_object):
     with open(jsonFilePath, 'w') as outfile:
         json.dump(listObj, outfile, indent = 3)
 
-def GetParamsDict(jewelName, jewelryImagePath, jewelryCADPath, CADVolume):
-    paramDict = {"Jewel name" : jewelName, "image path" : jewelryImagePath, "cad path" : jewelryCADPath, "cad volume" : CADVolume}
+def GetParamsDict(jewelName, jewelryImagePath, jewelryCADPath, CADVolume, bRingResize, bQuries):
+    paramDict = {"Jewel name" : jewelName, "image path" : jewelryImagePath, "cad path" : jewelryCADPath, "cad volume" : CADVolume, "ring resizable" : bRingResize, "ring ungroupable" : bQuries[0], "Large stone missing" : bQuries[1]}
     return paramDict
 
 def FindCADFileFromJewelName(jewelName, CADCollectionFolderList):
@@ -75,37 +74,49 @@ def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
                 # Find CAD file from image file
                 jewelName = os.path.splitext(imageFilename)[0]
                 CADFilePath = FindCADFileFromJewelName(jewelName, CADCollectionFolderList)
-                CADVolume = 0.0
                 if os.path.isfile(CADFilePath):
                     # Load CAD file
                     print "Cad File path :" + CADFilePath 
                     CADFolderPath = os.path.dirname(CADFilePath)
                     CADName = os.path.basename(CADFilePath)
-                    strOpenCmd ='_-Open "' + CADFilePath +'"'
-                    print "StrOpenCmd : "+strOpenCmd
+                    
+                    # Open 3DM file
                     bOpened = rs.Command('_-Open No '+'"'+CADFilePath+'"')
                     if not bOpened:
                         bOpened = rs.Command('_-Open '+'"'+CADFilePath+'"')
+
                     # rs.Command('_-Open "D:\\Work\\projects\\Jewelry\\CAD Files\\Just RIng\\", DR-5600.3dm')
                     # rs.Command('_-Insert "' + CADFilePath +'" Objects Enter 0,0,0 1 0')
+
+                    # Check if ring resizer works 
                     # Compute volume
                     if bOpened:
                         CADVolume = 0.0
+                        bRingResize = [False]
+                        items = ("RingResizer", "No", "Yes")
+                        bRingResize = rs.GetBoolean("Check queries", items, (False) )
+                        rs.Command("-Ungroup")
                         object_ids = rs.GetObjects("Select objects to compute volume")
-                        for object_i in object_ids:
-                            if object_i:
-                                brep = rs.coercebrep(object_i)
-                                if brep:
-                                    blockVolume = brep.GetVolume()
-                                    CADVolume = CADVolume + blockVolume
-                    print CADVolume
-                    
-                # sc.doc.Objects.Clear()
+                        if object_ids :
+                            for object_i in object_ids:
+                                if object_i:
+                                    brep = rs.coercebrep(object_i)
+                                    if brep:
+                                        blockVolume = brep.GetVolume()
+                                        CADVolume = CADVolume + blockVolume
+                                        # print CADVolume
+                                        # print "results :", results 
+                        items = ("CanUngroup", "No", "Yes"),("LargeStoneMissing","No","Yes")
+                        bQuries = rs.GetBoolean("Check queries", items, (False,False) )
+                        if bRingResize is None:
+                            bRingResize = rs.GetBoolean("Check queries", items, (False) )
+                        if bQuries is None:
+                            bQuries = rs.GetBoolean("Check queries", items, (False,False) )
 
-                # Update Catalague info
-                paramDict = GetParamsDict(jewelName, filePath, CADFilePath,CADVolume)
-                json_object = json.dumps(paramDict, indent = 4)
-                UpdateJsonFile(imageCollectionFolder, json_object)
+                        # Update Catalague info
+                        paramDict = GetParamsDict(jewelName, filePath, CADFilePath,CADVolume,bRingResize[0], bQuries)
+                        json_object = json.dumps(paramDict, indent = 4)
+                        UpdateJsonFile(imageCollectionFolder, json_object)
 
 # Defining main function
 def main():
