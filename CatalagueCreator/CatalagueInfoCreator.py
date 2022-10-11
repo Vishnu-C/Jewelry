@@ -120,7 +120,7 @@ def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
 
 # Defining main function
 def main():
-    CreateCatalagueInfo("D:\\Work\\projects\\Jewelry\\Catalague\\Ring Collection\\Color stone", ["D:\\Work\\projects\\Jewelry\\CAD Files\\Just RIng","D:\\Work\\projects\\Jewelry\\CAD Files\\Ladies Ring Collection"])
+    CreateCatalagueInfo("D:/Work/projects/Jewelry/Catalague/Ring Collection/Color stone", ["D:/Work/projects/Jewelry/CAD Files/Just RIng","D:/Work/projects/Jewelry/CAD Files/Ladies Ring Collection"])
     
 if __name__ == "__main__":
     main()
