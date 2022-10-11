@@ -70,12 +70,6 @@ def FindCADFileFromJewelName(jewelName, CADCollectionFolderList):
 
 
 def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
-    # numberOfInputArgs = len(sys.argv)
-    # imageCollectionFolder = sys.argv[1]
-    # CADCollectionFolderList = []
-    # for c in range (2,numberOfInputArgs):
-    #     CADCollectionFolderList.append(sys.argv[c])
-
     # iterate over files in image collection folder
     for imageFilename in os.listdir(imageCollectionFolder):
         if (imageFilename.endswith(".png") or imageFilename.endswith(".jpg") or imageFilename.endswith(".jpeg")):
@@ -133,7 +127,12 @@ def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
 
 # Defining main function
 def main():
-    CreateCatalagueInfo("D:/Work/projects/Jewelry/Catalague/Ring Collection/Color stone", ["D:/Work/projects/Jewelry/CAD Files/Just RIng","D:/Work/projects/Jewelry/CAD Files/Ladies Ring Collection"])
+    # Inputs
+    selected_images_folder_path = "D:/Work/projects/Jewelry/Catalague/Ring Collection/Color stone"
+    CAD_folder_path =  ["D:/Work/projects/Jewelry/CAD Files/Just RIng","D:/Work/projects/Jewelry/CAD Files/Ladies Ring Collection"]
+
+    # Start Info creator
+    CreateCatalagueInfo(selected_images_folder_path,CAD_folder_path)
     
 if __name__ == "__main__":
     main()
