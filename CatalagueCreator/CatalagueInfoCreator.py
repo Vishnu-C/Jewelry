@@ -1,13 +1,26 @@
+#########
+# Creates Catalauge info as json file, which is used for creating pdf catalague
+# Author - Vishnu C
+#########
+
+##### Process performed
 # Given folder with jewelry images
 # respective CAD file is found 
 # Check if CAD can be opened
-# Estimate the mass of the jewelry in gms
+# Estimate the volume of the jewelry in m3
 # Check if can be resized with RingResizer of MatrixGold
+# Check if can be ungrouped so that can resize with RingResizer of RhinoGold
 # Create an unique ID 
-# Create/Update json file with image name, CAD name, unique name, mass, can resize
+# Create/Update json file with image name, CAD name, unique name, volume and various checks
 
-# Run command
-# python CatalagueCreator.py -imageCollection <folder_path> -CADCollection list[<folder_path>] 
+###### Prerequest
+# A manual selection of images is done and kept in a individual folder 
+
+###### Run command
+# python CatalagueInfoCreator.py -imageCollection <selected_images_folder_path> -CADCollection list[<CAD_folder_path>]
+ 
+# Selected images for catalgue creation <selected_images_folder_path>, the folder paths of all the respective CAD files to be searched for are to be listed in [<CAD_folder_path>] 
+
 import json
 import sys
 import os
