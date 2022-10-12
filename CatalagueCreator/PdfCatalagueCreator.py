@@ -1,5 +1,6 @@
 import os
 import json
+import math
 
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Frame, Spacer, Image
 from reportlab.lib.units import cm
@@ -71,7 +72,7 @@ def CreateReportLabPDF(jewelInfos, pdfFilePath, fImageDimension):
                 im = Image(aJewelInfo[0], fImageDimension[0]*cm, fImageDimension[1]*cm)
                 imagesList.append(im)
                 designWeight = aJewelInfo[1]
-                strDesignWeight = "{:.3f}".format(designWeight)
+                strDesignWeight = str(designWeight)
                 designName = aJewelInfo[2]
                 # print (i+ii, ii, designName)
                 designList.append(designName+" : "+strDesignWeight+" gm")
@@ -92,6 +93,11 @@ def CreateReportLabPDF(jewelInfos, pdfFilePath, fImageDimension):
     doc = SimpleDocTemplate(pdfFilePath, pagesize=A4)
     doc.build(elements, onFirstPage=AllPageSetup, onLaterPages=AllPageSetup)
 
+def GetWeight(fVolume):
+    mass = densityGold22K * fVolume
+    mass = math.ceil(mass)
+    return mass
+
 def GetJewelInfo(catalagueInfoJsonFile):
     jewelInfos = []
     if os.path.isfile(catalagueInfoJsonFile):
@@ -109,7 +115,9 @@ def GetJewelInfo(catalagueInfoJsonFile):
                         if bUngroupable:
                             strImagePath = aInfo["image path"]
                     if len(strImagePath) > 0:
-                        mass = densityGold22K * fVolume
+                        mass = GetWeight(fVolume)
+                        if mass == 5 or mass == 7:
+                            continue
                         strUniqueName = aInfo["Unique name"]
                         aJewelInfo = [strImagePath,mass,strUniqueName]
                         jewelInfos.append(aJewelInfo)

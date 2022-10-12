@@ -42,13 +42,13 @@ def UpdateJsonFile(imageCollectionFolder, json_object):
     with open(jsonFilePath, 'w') as outfile:
         json.dump(listObj, outfile, indent = 3)
 
-def GetParamsDict(jewelName, jewelryImagePath, jewelryCADPath, CADVolume, bRingResize, bQuries):
-    paramDict = {"Jewel name" : jewelName, "image path" : jewelryImagePath, "cad path" : jewelryCADPath, "cad volume" : CADVolume, "ring resizable" : bRingResize, "ring ungroupable" : bQuries[0], "Large stone missing" : bQuries[1]}
+def GetParamsDict(uniqueName, jewelName, jewelryImagePath, jewelryCADPath, CADVolume, bRingResize, bQuries):
+    paramDict = {"Unique name" : uniqueName, "Jewel name" : jewelName, "image path" : jewelryImagePath, "cad path" : jewelryCADPath, "cad volume" : CADVolume, "ring resizable" : bRingResize, "ring ungroupable" : bQuries[0], "Large stone missing" : bQuries[1]}
     return paramDict
 
 def FindCADFileFromJewelName(jewelName, CADCollectionFolderList):
     CADFile = ""
-    ignoreKeys = ["DOC", "P", "S", "T", "F"]
+    ignoreKeys = ["DOC", "P", "S", "T", "F", "GP"]
     for CADCollectionFolder in CADCollectionFolderList:
         for path, subdirs, files in os.walk(CADCollectionFolder):
             for CADFile in files:
@@ -68,9 +68,20 @@ def FindCADFileFromJewelName(jewelName, CADCollectionFolderList):
                         return CADFile
     return CADFile
 
+def IsAddedBefore(imageCollectionFolder, CADFilePath):
+    jsonFilePath = os.path.join(imageCollectionFolder,"CatalagueInfo.json")
+    if os.path.isfile(jsonFilePath):
+        with open(jsonFilePath, 'r') as readfile:
+            infoListObj = json.load(readfile)
+            for aInfo in infoListObj:
+                strCADPath = aInfo["cad path"]
+                if strCADPath == CADFilePath:
+                    return True
+    return False
 
-def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
+def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList,designIdentifier):
     # iterate over files in image collection folder
+    count = 1
     for imageFilename in os.listdir(imageCollectionFolder):
         if (imageFilename.endswith(".png") or imageFilename.endswith(".jpg") or imageFilename.endswith(".jpeg")):
             filePath = os.path.join(imageCollectionFolder, imageFilename)
@@ -81,7 +92,8 @@ def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
                 # Find CAD file from image file
                 jewelName = os.path.splitext(imageFilename)[0]
                 CADFilePath = FindCADFileFromJewelName(jewelName, CADCollectionFolderList)
-                if os.path.isfile(CADFilePath):
+                bAddedBefore = IsAddedBefore(imageCollectionFolder, CADFilePath)
+                if os.path.isfile(CADFilePath) and not bAddedBefore:
                     # Load CAD file
                     print "Cad File path :" + CADFilePath 
                     CADFolderPath = os.path.dirname(CADFilePath)
@@ -125,19 +137,23 @@ def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList):
                         if bQuries is None:
                             bQuries = rs.GetBoolean("Check queries", items, (False,False) )
 
+                        uniqueName = designIdentifier + str(count)
+                        count = count + 1
+
                         # Update Catalague info
-                        paramDict = GetParamsDict(jewelName, filePath, CADFilePath,CADVolume,bRingResize[0], bQuries)
+                        paramDict = GetParamsDict(uniqueName, jewelName, filePath, CADFilePath,CADVolume,bRingResize[0], bQuries)
                         json_object = json.dumps(paramDict, indent = 4)
                         UpdateJsonFile(imageCollectionFolder, json_object)
 
 # Defining main function
 def main():
     # Inputs
-    selected_images_folder_path = "D:/Work/projects/Jewelry/Catalague/Ring Collection/Color stone"
+    selected_images_folder_path = "D:/Work/projects/Jewelry/Catalague/Ring Collection/Floral"
     CAD_folder_path =  ["D:/Work/projects/Jewelry/CAD Files/Just RIng","D:/Work/projects/Jewelry/CAD Files/Ladies Ring Collection"]
+    designIdentifier = "FL"
 
     # Start Info creator
-    CreateCatalagueInfo(selected_images_folder_path,CAD_folder_path)
+    CreateCatalagueInfo(selected_images_folder_path,CAD_folder_path,designIdentifier)
     
 if __name__ == "__main__":
     main()
