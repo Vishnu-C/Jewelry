@@ -18,6 +18,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 densityGold22K = 15.6 #g/cm3
 fTableWidth = 4.5
+DesignName = "DESIGN NAME"
 
 def AllPageSetup(canvas, doc):
 
@@ -40,7 +41,7 @@ def AllPageSetup(canvas, doc):
     canvas.setFillColorRGB(1.0, 0.84, 0.0) # gold
     canvas.setFont('JewelFont', 55)
     #header
-    canvas.drawRightString(20.0 * cm, 27 * cm, "COLOR STONE")
+    canvas.drawRightString(20.0 * cm, 27 * cm, DesignName)
     # canvas.drawRightString(10.5 * cm, 29 * cm, "doc.report_info")
 
     canvas.restoreState()
@@ -128,6 +129,8 @@ def main():
     # Input
     catalagueInfoJsonFile = "D:\Work\projects\Jewelry\Catalague\Ring Collection\Color stone\CatalagueInfo.json"
     pdfOutputFile = "D:\Work\projects\Jewelry\Catalague\Ring Collection\Color stone\Catalague_ColorStone.pdf"
+    global DesignName
+    DesignName = "SELVI RINGS"
     fImageDimension = [4.0,3.0]
 
     jewelInfos = GetJewelInfo(catalagueInfoJsonFile)
