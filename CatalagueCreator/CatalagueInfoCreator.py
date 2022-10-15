@@ -11,15 +11,7 @@
  
 # Selected images for catalgue creation <selected_images_folder_path>, the folder paths of all the respective CAD files to be searched are listed in [<CAD_folder_path>] 
 
-##### Process performed
-# Given folder with jewelry images
-# respective CAD file is found 
-# Check if CAD can be opened
-# Estimate the volume of the jewelry in m3
-# Check if can be resized with RingResizer of MatrixGold
-# Check if can be ungrouped so that can resize with RingResizer of RhinoGold
-# Create an unique ID 
-# Create/Update json file with image name, CAD name, unique name, volume and various checks
+
 
 import json
 import sys
@@ -79,7 +71,16 @@ def IsAddedBefore(imageCollectionFolder, CADFilePath):
                     return True
     return False
 
-def CreateCatalagueInfo(imageCollectionFolder, CADCollectionFolderList,designIdentifier):
+##### CreateCatalagueInfo_Ring3dm - Process performed
+# Given folder with jewelry images
+# respective CAD file is found 
+# Check if CAD can be opened
+# Estimate the volume of the jewelry in m3
+# Check if can be resized with RingResizer of MatrixGold
+# Check if can be ungrouped so that can resize with RingResizer of RhinoGold
+# Create an unique ID from designIdentifier
+# Create/Update json file with image name, CAD name, unique name, volume and various checks
+def CreateCatalagueInfo_Ring3dm(imageCollectionFolder, CADCollectionFolderList,designIdentifier):
     # iterate over files in image collection folder
     count = 1
     for imageFilename in os.listdir(imageCollectionFolder):
@@ -153,7 +154,7 @@ def main():
     designIdentifier = "FL"
 
     # Start Info creator
-    CreateCatalagueInfo(selected_images_folder_path,CAD_folder_path,designIdentifier)
+    CreateCatalagueInfo_Ring3dm(selected_images_folder_path,CAD_folder_path,designIdentifier)
     
 if __name__ == "__main__":
     main()
